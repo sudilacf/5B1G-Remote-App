@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="350dp"
+    android:layout_height="200dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="5dp"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="28sp"
+            android:textColor="@color/black"
+            android:text="TITLE"
+            android:fontFamily="@font/roboto_black"
+            android:id="@+id/title"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:text="Subtitle"
+            android:fontFamily="@font/roboto_medium"
+            android:layout_marginTop="16dp"
+            android:id="@+id/subtitle"
+            android:layout_below="@id/title"
+            android:layout_centerHorizontal="true"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/subtitle"
+            android:gravity="center"
+            android:layout_marginTop="24dp">
+
+            <android.widget.Button
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:textSize="16dp"
+                android:textColor="#424242"
+                android:text="cancel"
+                android:textAllCaps="true"
+                android:layout_marginEnd="24dp"
+                android:background="@drawable/dialog_cancel_bg"
+                android:id="@+id/cancelButton"/>
+
+            <android.widget.Button
+                android:layout_width="120dp"
+                android:layout_height="50dp"
+                android:textSize="16dp"
+                android:textColor="@color/white"
+                android:text="confirm"
+                android:textAllCaps="true"
+                android:background="@drawable/dialog_confirm_bg"
+                android:id="@+id/confirmButton"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFAFA">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:backgroundTint="@color/blue"
+        android:id="@+id/card1"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        android:layout_centerHorizontal="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="12dp">
+
+
+            <TextView
+                android:id="@+id/lastFedLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last Fed:"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:layout_marginTop="8dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/gems_buck"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="01 minute ago"
+                android:textColor="#00FF00"
+                android:layout_below="@id/lastFedLabel"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/technology"
+                android:textSize="24sp"
+                android:id="@+id/lastFed"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_below="@id/lastFed"
+                android:layout_marginTop="12dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginEnd="12dp"
+                android:background="#E0E0E0"
+                android:id="@+id/divider"/>
+
+            <TextView
+                android:id="@+id/nextFeedLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Next feed in:"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/gems_buck"
+                android:layout_below="@id/divider"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="01 minute ago"
+                android:textColor="#00FF00"
+                android:layout_below="@id/nextFeedLabel"
+                android:layout_centerHorizontal="true"
+                android:fontFamily="@font/technology"
+                android:textSize="24sp"
+                android:id="@+id/nextFeed"/>
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/card1"
+        android:layout_marginTop="12dp">
+
+        <LinearLayout
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:id="@+id/feedNow"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/grain"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Feed Now"
+                android:textSize="14sp"
+                android:fontFamily="@font/roboto_black"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:id="@+id/scheduleSettings"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="32dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/clock"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Schedule Settings"
+                android:textSize="14sp"
+                android:fontFamily="@font/roboto_black"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:id="@+id/wifiSettings"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="32dp"
+            android:layout_below="@+id/feedNow"
+            android:layout_alignParentStart="true">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/rss"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WiFi Settings"
+                android:textSize="14sp"
+                android:fontFamily="@font/roboto_black"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:id="@+id/feedSettings"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginEnd="16dp"
+            android:layout_marginTop="32dp"
+            android:layout_below="@id/scheduleSettings"
+            android:layout_alignParentEnd="true">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/tune"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Feeds Settings"
+                android:textSize="14sp"
+                android:fontFamily="@font/roboto_black"/>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>

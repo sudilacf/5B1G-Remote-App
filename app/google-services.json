@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "894476213545",
+    "firebase_url": "https://b1g-1a44a-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "b1g-1a44a",
+    "storage_bucket": "b1g-1a44a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:894476213545:android:c615b4773f4c4022716b38",
+        "android_client_info": {
+          "package_name": "com.fish.feeder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAIX1IMlZFC1g11X8o4WYDk80vbG9158C8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
