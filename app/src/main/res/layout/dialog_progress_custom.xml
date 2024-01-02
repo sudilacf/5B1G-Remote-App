@@ -29,7 +29,8 @@
             android:layout_toEndOf="@id/progress"
             android:textSize="20sp"
             android:fontFamily="@font/roboto_medium"
-            android:layout_marginStart="24dp"/>
+            android:layout_marginStart="24dp"
+            android:id="@+id/message"/>
 
     </RelativeLayout>
 
