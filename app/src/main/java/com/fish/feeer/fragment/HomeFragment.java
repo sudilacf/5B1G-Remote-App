@@ -17,8 +17,12 @@ import androidx.fragment.app.Fragment;
 
 import com.fish.feeer.databinding.FragmentHomeBinding;
 import com.fish.feeer.dialog.CustomDialog;
+import com.fish.feeer.dialog.CustomProgressDialog;
 import com.fish.feeer.model.History;
 import com.fish.feeer.util.Util;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,10 +38,13 @@ public class HomeFragment extends Fragment {
     private FirebaseDatabase database;
     private DatabaseReference historyReference;
     private DatabaseReference feedReference;
+    private DatabaseReference settingsReference;
 
     private Handler handler;
+    private CustomProgressDialog progressDialog;
     private long lastEpochTime;
     private String feedOnValue;
+    private String pushKeyValue;
 
     @Nullable
     @Override
@@ -47,10 +54,16 @@ public class HomeFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
         historyReference = database.getReference("history");
         feedReference = database.getReference("feed");
+        settingsReference = database.getReference("settings");
         handler = new Handler(Looper.getMainLooper());
+        progressDialog = new CustomProgressDialog.Builder(getContext())
+                .setCancelable(false)
+                .setMessage("Please wait!...")
+                .build();
 
         historyReference.limitToLast(1).addValueEventListener(historyEventListener);
         feedReference.child("on").addValueEventListener(feedEventListener);
+        settingsReference.child("push_key").addListenerForSingleValueEvent(pushKeyEventListener);
         handler.post(runnable);
 
         Util.setGradientBackground(binding.feedNow, "#A8FF78", "#78FFD6", 24, true);
@@ -68,7 +81,22 @@ public class HomeFragment extends Fragment {
                         @Override
                         public void onClick() {
 
-                            feedReference.child("now").setValue(true);
+                            progressDialog.show();
+
+                            feedReference.child("now")
+                                    .setValue(true)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+
+                                            if(task.isSuccessful()) {
+
+                                                progressDialog.show();
+
+                                            }
+
+                                        }
+                                    });
 
                         }
                     })
@@ -82,12 +110,21 @@ public class HomeFragment extends Fragment {
 
     }
 
-    private ValueEventListener historyEventListener = new ValueEventListener() {
+    private final ValueEventListener historyEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot snapshot) {
 
-            History history = snapshot.getChildren().iterator().next().getValue(History.class);
+            DataSnapshot data= snapshot.getChildren().iterator().next();
+
+            History history = data.getValue(History.class);
             lastEpochTime = history.getEpoch_time();
+
+            if(pushKeyValue != null && !pushKeyValue.equals(data.getKey())) {
+
+                progressDialog.dismiss();
+                pushKeyValue = data.getKey();
+
+            }
 
         }
 
@@ -97,11 +134,25 @@ public class HomeFragment extends Fragment {
         }
     };
 
-    private ValueEventListener feedEventListener = new ValueEventListener() {
+    private final ValueEventListener feedEventListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot snapshot) {
 
             feedOnValue = snapshot.getValue(String.class);
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
+    };
+
+    private final ValueEventListener pushKeyEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+            pushKeyValue = snapshot.getValue(String.class);
 
         }
 

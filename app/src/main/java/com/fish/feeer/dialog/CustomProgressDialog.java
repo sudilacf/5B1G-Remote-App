@@ -35,6 +35,8 @@ public class CustomProgressDialog {
         dialog.dismiss();
     }
 
+    public boolean isShowing() { return dialog.isShowing(); }
+
     public static class Builder {
 
         private Context context;
@@ -56,7 +58,7 @@ public class CustomProgressDialog {
         }
 
         public CustomProgressDialog build() {
-
+            return new CustomProgressDialog(this);
         }
 
     }
