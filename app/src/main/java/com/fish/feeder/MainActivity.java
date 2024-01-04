@@ -1,17 +1,19 @@
-package com.fish.feeer;
+package com.fish.feeder;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import com.fish.feeer.adapter.PageAdapter;
-import com.fish.feeer.databinding.ActivityMainBinding;
-import com.fish.feeer.fragment.HistoryFragment;
-import com.fish.feeer.fragment.HomeFragment;
+import com.fish.feeder.adapter.PageAdapter;
+import com.fish.feeder.databinding.ActivityMainBinding;
+import com.fish.feeder.fragment.HistoryFragment;
+import com.fish.feeder.fragment.HomeFragment;
 import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
@@ -23,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
     private List<Fragment> fragments;
     private HomeFragment homeFragment;
     private HistoryFragment historyFragment;
+
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,4 +67,19 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+
+            if(grantResults[0] == PackageManager.PERMISSION_DENIED) {
+
+                Toast.makeText(getApplicationContext(), "Please allow the permission to configure WiFi!", Toast.LENGTH_LONG).show();
+
+            }
+
+        }
+
+    }
 }

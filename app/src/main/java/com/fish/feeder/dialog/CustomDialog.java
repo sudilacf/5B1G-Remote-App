@@ -1,10 +1,10 @@
-package com.fish.feeer.dialog;
+package com.fish.feeder.dialog;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 
-import com.fish.feeer.databinding.DialogCustomBinding;
+import com.fish.feeder.databinding.DialogCustomBinding;
 
 public class CustomDialog {
 

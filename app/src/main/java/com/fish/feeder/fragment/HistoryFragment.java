@@ -1,19 +1,18 @@
-package com.fish.feeer.fragment;
+package com.fish.feeder.fragment;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.fish.feeer.adapter.HistoryAdapter;
-import com.fish.feeer.databinding.FragmentHistoryBinding;
-import com.fish.feeer.model.History;
+import com.fish.feeder.adapter.HistoryAdapter;
+import com.fish.feeder.databinding.FragmentHistoryBinding;
+import com.fish.feeder.model.History;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;

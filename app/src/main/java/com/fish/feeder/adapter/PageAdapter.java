@@ -1,4 +1,4 @@
-package com.fish.feeer.adapter;
+package com.fish.feeder.adapter;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

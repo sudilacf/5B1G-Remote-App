@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.fish.feeer"
+    namespace = "com.fish.feeder"
     compileSdk = 33
 
     defaultConfig {

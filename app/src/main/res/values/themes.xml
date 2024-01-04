@@ -13,4 +13,15 @@
         <item name="android:color">@color/blue</item>
     </style>
 
+    <style name="DialogPickerButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">@color/blue</item>
+    </style>
+
+    <style name="DialogPickerTheme" parent="Theme.Material3.DayNight.Dialog.Alert">
+        <item name="colorAccent">@color/blue</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/DialogPickerButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DialogPickerButtonStyle</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/DialogPickerButtonStyle</item>
+    </style>
+
 </resources>

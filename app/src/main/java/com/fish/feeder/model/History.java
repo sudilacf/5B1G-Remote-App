@@ -1,4 +1,4 @@
-package com.fish.feeer.model;
+package com.fish.feeder.model;
 
 public class History {
 

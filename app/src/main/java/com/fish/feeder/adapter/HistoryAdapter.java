@@ -1,4 +1,4 @@
-package com.fish.feeer.adapter;
+package com.fish.feeder.adapter;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.fish.feeer.databinding.ItemHistoryBinding;
-import com.fish.feeer.model.History;
-import com.fish.feeer.util.Util;
+import com.fish.feeder.databinding.ItemHistoryBinding;
+import com.fish.feeder.model.History;
+import com.fish.feeder.util.Util;
 
 import java.util.List;
 

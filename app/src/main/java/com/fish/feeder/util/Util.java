@@ -1,12 +1,19 @@
-package com.fish.feeer.util;
+package com.fish.feeder.util;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.TimeZone;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.RequiresApi;
@@ -102,15 +109,6 @@ public class Util {
 
     public static void setGradientBackground(View view, String startColor, String endColor, float radius, boolean ripple) {
 
-        /*view.setBackground(new GradientDrawable() {
-            public GradientDrawable gradientDrawable() {
-                this.setOrientation(Orientation.LEFT_RIGHT);
-                this.setColors(new int[] {Color.parseColor(startColor), Color.parseColor(endColor)});
-                this.setCornerRadius(radius);
-                return this;
-            }
-        }.gradientDrawable());*/
-
         GradientDrawable gradientDrawable = new GradientDrawable();
 
         gradientDrawable.setOrientation(GradientDrawable.Orientation.LEFT_RIGHT);
@@ -127,6 +125,45 @@ public class Util {
             view.setBackground(gradientDrawable);
 
         }
+
+    }
+
+    public static boolean isConnectedToMachine(Context context) {
+
+        final String machineBSSID = "24:dc:c3:a6:ec:15";
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+
+        if(networkInfo != null && networkInfo.isConnectedOrConnecting() && networkInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+
+            WifiManager wifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+            WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+            Log.i("MAC", wifiInfo.getBSSID());
+
+            return wifiInfo.getBSSID().equals(machineBSSID);
+
+        }
+
+        return false;
+
+    }
+
+    public static  boolean isLocationEnabled(Context context) {
+
+        LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {}
+
+        return gps_enabled && network_enabled;
 
     }
 

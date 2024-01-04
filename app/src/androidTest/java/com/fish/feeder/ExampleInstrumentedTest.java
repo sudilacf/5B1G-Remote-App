@@ -1,4 +1,4 @@
-package com.fish.feeer;
+package com.fish.feeder;
 
 import android.content.Context;
 
