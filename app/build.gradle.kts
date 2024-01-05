@@ -47,4 +47,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
     implementation("com.google.firebase:firebase-database")
 
+    implementation ("com.android.volley:volley:1.2.1")
+
 }

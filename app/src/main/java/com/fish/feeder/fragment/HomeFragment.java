@@ -3,8 +3,13 @@ package com.fish.feeder.fragment;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +17,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -27,6 +33,7 @@ import com.fish.feeder.R;
 import com.fish.feeder.databinding.FragmentHomeBinding;
 import com.fish.feeder.dialog.CustomDialog;
 import com.fish.feeder.dialog.CustomProgressDialog;
+import com.fish.feeder.dialog.WiFiPickerDialog;
 import com.fish.feeder.model.History;
 import com.fish.feeder.util.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -38,7 +45,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class HomeFragment extends Fragment {
 
@@ -183,29 +192,54 @@ public class HomeFragment extends Fragment {
 
                 } else {
 
-                    if(Util.isLocationEnabled(getContext())) {
+                    /*if(Util.isConnectedToMachine(getContext())) {
 
-                        if(Util.isConnectedToMachine(getContext())) {
+                        if(Util.isLocationEnabled(getContext())) {*/
 
-                            Toast.makeText(getContext(), "Connected", Toast.LENGTH_LONG).show();
+                            new WiFiPickerDialog.Builder(getContext())
+                                    .setTitle("Select Network")
+                                    .setCancelable(false)
+                                    .setOnCloseButtonClick(new WiFiPickerDialog.ButtonClickListener() {
+                                        @Override
+                                        public void onClick() {
 
-                        } else {
+                                        }
+                                    })
+                                    .setOnScanButtonClick(new WiFiPickerDialog.ButtonClickListener() {
+                                        @Override
+                                        public void onClick() {
 
-                            Toast.makeText(getContext(), "Please connect to \"5B1G\" WiFi to configure!", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getContext(), "Scanning available networks...", Toast.LENGTH_SHORT).show();
 
+                                        }
+                                    })
+                                    .setOnConfirmButtonClick(new WiFiPickerDialog.ButtonClickListener() {
+                                        @Override
+                                        public void onClick() {
+
+
+
+                                        }
+                                    })
+                                    .build()
+                                    .show();
+
+                        /*} else {
+
+                            new CustomDialog.Builder(getContext())
+                                    .setTitle("Warning!")
+                                    .setMessage("Please enable location to continue!")
+                                    .setCancelButton("Cancel", null)
+                                    .setConfirmButton("Confirm", null)
+                                    .build()
+                                    .show();
                         }
 
                     } else {
 
-                        new CustomDialog.Builder(getContext())
-                                .setTitle("Warning!")
-                                .setMessage("Please enable location to continue!")
-                                .setCancelButton("Cancel", null)
-                                .setConfirmButton("Cofirm", null)
-                                .build()
-                                .show();
+                        Toast.makeText(getContext(), "Please connect to \"5B1G\" WiFi to configure!", Toast.LENGTH_LONG).show();
 
-                    }
+                    }*/
 
                 }
             }
@@ -269,7 +303,7 @@ public class HomeFragment extends Fragment {
         }
     };
 
-    private Runnable runnable = new Runnable() {
+    private final Runnable runnable = new Runnable() {
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void run() {

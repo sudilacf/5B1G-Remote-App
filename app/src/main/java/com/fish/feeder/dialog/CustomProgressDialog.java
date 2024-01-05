@@ -1,45 +1,53 @@
 package com.fish.feeder.dialog;
 
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 
 import com.fish.feeder.databinding.DialogProgressCustomBinding;
 
-public class CustomProgressDialog {
+public class CustomProgressDialog extends Dialog {
 
-    private final Context context;
-    private final String message;
-    private final boolean cancelable;
+    private Context context;
+    private String message;
+    private boolean cancelable;
 
-    private DialogProgressCustomBinding binding;
-    private AlertDialog dialog;
+    private final DialogProgressCustomBinding binding;
 
-    private CustomProgressDialog(Builder builder) {
+    public CustomProgressDialog(Context context) {
+
+        super(context);
+        binding = DialogProgressCustomBinding.inflate(LayoutInflater.from(context));
+        this.setContentView(binding.getRoot());
+        this.getWindow().setBackgroundDrawable(new GradientDrawable() { public GradientDrawable gd() { this.setColor(Color.TRANSPARENT); return this; } }.gd());
+        binding.message.setText(this.message);
+
+    }
+
+    private CustomProgressDialog(Context context, Builder builder) {
+
+        super(context);
         this.context = builder.context;
         this.message = builder.message;
         this.cancelable = builder.cancelable;
         binding = DialogProgressCustomBinding.inflate(LayoutInflater.from(context));
+        this.setContentView(binding.getRoot());
         binding.message.setText(this.message);
-        dialog = new AlertDialog.Builder(context)
-                .setView(binding.getRoot())
-                .setCancelable(this.cancelable)
-                .create();
+        this.getWindow().setBackgroundDrawable(new GradientDrawable() { public GradientDrawable gd() { this.setColor(Color.TRANSPARENT); return this; } }.gd());
+        binding.message.setText(this.message);
+
     }
 
-    public void show() {
-        dialog.show();
+    @Override
+    public void setCancelable(boolean cancelable) {
+        this.cancelable = cancelable;
     }
-
-    public void dismiss() {
-        dialog.dismiss();
-    }
-
-    public boolean isShowing() { return dialog.isShowing(); }
 
     public static class Builder {
 
-        private Context context;
+        private final Context context;
         private String message;
         private boolean cancelable = true;
 
@@ -58,7 +66,7 @@ public class CustomProgressDialog {
         }
 
         public CustomProgressDialog build() {
-            return new CustomProgressDialog(this);
+            return new CustomProgressDialog(context, this);
         }
 
     }
