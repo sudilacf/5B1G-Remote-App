@@ -12,7 +12,6 @@ public class CustomProgressDialog extends Dialog {
 
     private Context context;
     private String message;
-    private boolean cancelable;
 
     private final DialogProgressCustomBinding binding;
 
@@ -29,20 +28,14 @@ public class CustomProgressDialog extends Dialog {
     private CustomProgressDialog(Context context, Builder builder) {
 
         super(context);
-        this.context = builder.context;
+        this.context = context;
         this.message = builder.message;
-        this.cancelable = builder.cancelable;
         binding = DialogProgressCustomBinding.inflate(LayoutInflater.from(context));
         this.setContentView(binding.getRoot());
-        binding.message.setText(this.message);
         this.getWindow().setBackgroundDrawable(new GradientDrawable() { public GradientDrawable gd() { this.setColor(Color.TRANSPARENT); return this; } }.gd());
+        this.setCancelable(builder.cancelable);
         binding.message.setText(this.message);
 
-    }
-
-    @Override
-    public void setCancelable(boolean cancelable) {
-        this.cancelable = cancelable;
     }
 
     public static class Builder {

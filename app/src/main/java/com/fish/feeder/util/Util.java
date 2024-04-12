@@ -107,6 +107,18 @@ public class Util {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static String getFormattedTime(String format, int offset) throws ParseException {
+
+        long epochTime = Instant.now().getEpochSecond() + (offset * 3600L);
+        Date date = new Date(epochTime);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.ENGLISH);
+        String formattedDate = sdf.format(date);
+
+        return formattedDate;
+
+    }
+
     public static void setGradientBackground(View view, String startColor, String endColor, float radius, boolean ripple) {
 
         GradientDrawable gradientDrawable = new GradientDrawable();

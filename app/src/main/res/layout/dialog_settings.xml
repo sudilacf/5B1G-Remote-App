@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
-    
+
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,28 +27,18 @@
                 android:layout_alignParentTop="true"
                 android:layout_marginStart="4dp"/>
 
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/close"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginEnd="4dp"
-                app:tint="#9E9E9E"
-                android:id="@+id/closeButton"/>
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:textColor="@color/black"
-                android:text="SSID"
+                android:text="Food Quantity"
                 android:fontFamily="@font/roboto_medium"
                 android:layout_below="@id/title"
                 android:layout_marginTop="28dp"
                 android:id="@+id/label1"/>
 
-            <Spinner
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:layout_below="@id/label1"
@@ -56,18 +46,25 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
-                android:entries="@array/wifi_picker_label"
-                android:padding="0dp"
-                android:id="@+id/wifiSSID"/>
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:textColorHint="#9E9E9E"
+                android:hint="Enter food quantity"
+                android:inputType="number"
+                android:singleLine="true"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:fontFamily="@font/roboto_medium"
+                android:id="@+id/foodQuantity"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:textColor="@color/black"
-                android:text="Password"
+                android:text="Food Frequency"
                 android:fontFamily="@font/roboto_medium"
-                android:layout_below="@id/wifiSSID"
+                android:layout_below="@id/foodQuantity"
                 android:layout_marginTop="16dp"
                 android:id="@+id/label2"/>
 
@@ -82,12 +79,13 @@
                 android:textSize="16sp"
                 android:textColor="@color/black"
                 android:textColorHint="#9E9E9E"
-                android:hint="Enter Password"
+                android:hint="Enter food frequency"
+                android:inputType="number"
                 android:singleLine="true"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
                 android:fontFamily="@font/roboto_medium"
-                android:id="@+id/wifiPassword"/>
+                android:id="@+id/foodFrequency"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -100,26 +98,26 @@
                     android:layout_height="40dp"
                     android:textSize="18sp"
                     android:textColor="@color/blue"
-                    android:text="Scan"
+                    android:text="Cancel"
                     android:fontFamily="@font/roboto_medium"
                     android:background="@drawable/dialog_wifi_picker_scan_bg"
                     android:textAllCaps="false"
                     android:layout_weight="1"
                     android:layout_marginEnd="2dp"
-                    android:id="@+id/scanBtn"/>
+                    android:id="@+id/cancelBtn"/>
 
                 <android.widget.Button
                     android:layout_width="wrap_content"
                     android:layout_height="40dp"
                     android:textSize="18sp"
                     android:textColor="@color/white"
-                    android:text="Confirm"
+                    android:text="Save"
                     android:fontFamily="@font/roboto_medium"
                     android:background="@drawable/dialog_wifi_picker_confirm_bg"
                     android:textAllCaps="false"
                     android:layout_weight="1"
                     android:layout_marginStart="2dp"
-                    android:id="@+id/confirmBtn"/>
+                    android:id="@+id/saveBtn"/>
 
             </LinearLayout>
 

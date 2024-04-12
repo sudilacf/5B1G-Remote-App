@@ -3,13 +3,7 @@ package com.fish.feeder.fragment;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.net.wifi.ScanResult;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,7 +11,6 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -29,10 +22,18 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.fish.feeder.R;
 import com.fish.feeder.databinding.FragmentHomeBinding;
 import com.fish.feeder.dialog.CustomDialog;
 import com.fish.feeder.dialog.CustomProgressDialog;
+import com.fish.feeder.dialog.SettingsDialog;
 import com.fish.feeder.dialog.WiFiPickerDialog;
 import com.fish.feeder.model.History;
 import com.fish.feeder.util.Util;
@@ -42,12 +43,17 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeFragment extends Fragment {
 
@@ -55,14 +61,14 @@ public class HomeFragment extends Fragment {
 
     private FirebaseDatabase database;
     private DatabaseReference historyReference;
-    private DatabaseReference feedReference;
-    private DatabaseReference settingsReference;
+    private DatabaseReference dataReference;
 
     private Handler handler;
     private CustomProgressDialog progressDialog;
     private long lastEpochTime;
-    private String feedOnValue;
+    private String nextFeedValue;
     private String pushKeyValue;
+    private boolean needToUpdateFrequency = false;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
 
@@ -73,8 +79,7 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         database = FirebaseDatabase.getInstance();
         historyReference = database.getReference("history");
-        feedReference = database.getReference("feed");
-        settingsReference = database.getReference("settings");
+        dataReference = database.getReference("data");
         handler = new Handler(Looper.getMainLooper());
         progressDialog = new CustomProgressDialog.Builder(getContext())
                 .setCancelable(false)
@@ -82,8 +87,8 @@ public class HomeFragment extends Fragment {
                 .build();
 
         historyReference.limitToLast(1).addValueEventListener(historyEventListener);
-        feedReference.child("on").addValueEventListener(feedEventListener);
-        settingsReference.child("push_key").addListenerForSingleValueEvent(pushKeyEventListener);
+        dataReference.child("next_feed").addValueEventListener(feedEventListener);
+        dataReference.child("push_key").addListenerForSingleValueEvent(pushKeyEventListener);
         handler.post(runnable);
 
         Util.setGradientBackground(binding.feedNow, "#A8FF78", "#78FFD6", 24, true);
@@ -103,7 +108,7 @@ public class HomeFragment extends Fragment {
 
                             progressDialog.show();
 
-                            feedReference.child("now")
+                            dataReference.child("now")
                                     .setValue(true)
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
@@ -117,6 +122,30 @@ public class HomeFragment extends Fragment {
 
                                         }
                                     });
+
+//                            feedReference.child("now")
+//                                    .runTransaction(new Transaction.Handler() {
+//                                        @NonNull
+//                                        @Override
+//                                        public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+//
+//                                            Long currentValue = currentData.getValue(Long.class);
+//                                            if(currentValue == null) {
+//                                                currentValue = 0L;
+//                                            }
+//                                            currentData.setValue(currentValue + 1);
+//
+//                                            return Transaction.success(currentData);
+//
+//                                        }
+//
+//                                        @Override
+//                                        public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+//
+//
+//
+//                                        }
+//                                    });
 
                         }
                     })
@@ -154,7 +183,7 @@ public class HomeFragment extends Fragment {
                                     .build();
                             progressDialog1.show();
 
-                            feedReference.child("on").setValue(newSchedule).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            dataReference.child("next_feed").setValue(newSchedule).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
 
@@ -192,32 +221,63 @@ public class HomeFragment extends Fragment {
 
                 } else {
 
-                    /*if(Util.isConnectedToMachine(getContext())) {
+                    /*if(Util.isLocationEnabled(getContext())) {
 
-                        if(Util.isLocationEnabled(getContext())) {*/
+                        if(Util.isConnectedToMachine(getContext())) {*/
 
                             new WiFiPickerDialog.Builder(getContext())
                                     .setTitle("Select Network")
                                     .setCancelable(false)
-                                    .setOnCloseButtonClick(new WiFiPickerDialog.ButtonClickListener() {
+                                    .onConfirmLister(new WiFiPickerDialog.OnConfirmListener() {
                                         @Override
-                                        public void onClick() {
+                                        public void onConfirmed(String SSID, String password) {
 
-                                        }
-                                    })
-                                    .setOnScanButtonClick(new WiFiPickerDialog.ButtonClickListener() {
-                                        @Override
-                                        public void onClick() {
+                                            JSONObject body = new JSONObject();
+                                            RequestQueue queue = Volley.newRequestQueue(getContext());
 
-                                            Toast.makeText(getContext(), "Scanning available networks...", Toast.LENGTH_SHORT).show();
+                                            try {
+                                                body.put("ssid", "Isildur");
+                                                body.put("password", "password");
+                                            } catch (JSONException e) {
+                                                throw new RuntimeException(e);
+                                            }
 
-                                        }
-                                    })
-                                    .setOnConfirmButtonClick(new WiFiPickerDialog.ButtonClickListener() {
-                                        @Override
-                                        public void onClick() {
+                                            StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                                                    "http://192.168.1.1",
+                                                    new Response.Listener<String>() {
+                                                        @Override
+                                                        public void onResponse(String response) {
 
+                                                            try {
+                                                                Toast.makeText(getContext(), new JSONObject(response).getString("message"), Toast.LENGTH_LONG).show();
+                                                            } catch (JSONException e) {
+                                                                Toast.makeText(getActivity(), e.toString(), Toast.LENGTH_SHORT).show();
+                                                            }
 
+                                                        }
+                                                    }, new Response.ErrorListener() {
+                                                        @Override
+                                                        public void onErrorResponse(VolleyError error) {
+
+                                                            Toast.makeText(getContext(), error.toString(), Toast.LENGTH_LONG).show();
+                                                            error.printStackTrace();
+
+                                                        }
+                                                    }) {
+
+                                                @Override
+                                                protected Map<String, String> getParams() throws AuthFailureError {
+
+                                                    Map<String, String> params = new HashMap<>();
+                                                    params.put("ssid", SSID);
+                                                    params.put("password", password);
+
+                                                    return params;
+
+                                                }
+                                            };
+
+                                            queue.add(stringRequest);
 
                                         }
                                     })
@@ -226,23 +286,93 @@ public class HomeFragment extends Fragment {
 
                         /*} else {
 
-                            new CustomDialog.Builder(getContext())
-                                    .setTitle("Warning!")
-                                    .setMessage("Please enable location to continue!")
-                                    .setCancelButton("Cancel", null)
-                                    .setConfirmButton("Confirm", null)
-                                    .build()
-                                    .show();
+                            Toast.makeText(getContext(), "Please connect to \"5B1G\" WiFi to configure!", Toast.LENGTH_LONG).show();
                         }
 
                     } else {
 
-                        Toast.makeText(getContext(), "Please connect to \"5B1G\" WiFi to configure!", Toast.LENGTH_LONG).show();
+                        new CustomDialog.Builder(getContext())
+                                    .setTitle("Warning!")
+                                    .setMessage("Due to Android restrictions, location need to be enabled to access WiFi state")
+                                    .setCancelButton("Cancel", null)
+                                    .setConfirmButton("Confirm", null)
+                                    .build()
+                                    .show();
 
                     }*/
 
                 }
             }
+
+        });
+        
+        binding.feedSettings.setOnClickListener(v->{
+
+            SettingsDialog settingsDialog = new SettingsDialog.Builder(getContext())
+                    .setTitle("Feed Settings")
+                    .setOnSaveListener(new SettingsDialog.OnSaveListener() {
+                        @Override
+                        public void onSaved(int quantity, int frequency) {
+
+                            progressDialog.show();
+
+                            dataReference.runTransaction(new Transaction.Handler() {
+                                @NonNull
+                                @Override
+                                public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+
+                                    Integer foodQuantity = currentData.child("food_quantity").getValue(Integer.class);
+                                    Integer offset = currentData.child("offset").getValue(Integer.class);
+                                    needToUpdateFrequency = frequency == offset;
+                                    currentData.child("food_quantity").setValue(quantity);
+                                    currentData.child("offset").setValue(frequency);
+
+                                    return Transaction.success(currentData);
+
+                                }
+
+                                @Override
+                                public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+
+                                    if (error != null) {
+                                        error.toException().printStackTrace();
+                                    } else {
+                                        if (committed && needToUpdateFrequency) {
+
+                                            CustomDialog dialog = new CustomDialog.Builder(getContext())
+                                                    .setTitle("Confirmation")
+                                                    .setMessage("Frequency was changed. Would you like to update next feed schedule?")
+                                                    .setCancelable(false)
+                                                    .setCancelButton("No", null)
+                                                    .setConfirmButton("Yes", new CustomDialog.OnClickListener() {
+                                                        @Override
+                                                        public void onClick() {
+
+                                                            dataReference.child("next_feed").setValue(Util.getFormattedTime(nextFeedValue, currentData.child("offset").getValue(Integer.class)))
+                                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                        @Override
+                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                            dialog.dismiss();
+                                                                        }
+                                                                    });
+        
+                                                        }
+                                                    })
+                                                    .build();
+
+                                            dialog.show();
+
+                                        }
+                                    }
+
+                                }
+                            });
+
+                        }
+                    })
+                    .create();
+
+            settingsDialog.show();
 
         });
 

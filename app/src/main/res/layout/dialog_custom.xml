@@ -1,38 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="350dp"
-    android:layout_height="200dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="5dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
     >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="16dp">
+        android:padding="8dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="28sp"
+            android:textSize="20sp"
             android:textColor="@color/black"
             android:text="TITLE"
             android:fontFamily="@font/roboto_black"
             android:id="@+id/title"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"/>
+            android:layout_alignParentTop="true"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:text="Subtitle"
             android:fontFamily="@font/roboto_medium"
             android:layout_marginTop="16dp"
+            android:layout_marginStart="4dp"
             android:id="@+id/subtitle"
-            android:layout_below="@id/title"
-            android:layout_centerHorizontal="true"/>
+            android:layout_below="@id/title"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -42,24 +41,26 @@
             android:layout_marginTop="24dp">
 
             <android.widget.Button
-                android:layout_width="120dp"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
                 android:textSize="16dp"
                 android:textColor="#424242"
-                android:text="cancel"
-                android:textAllCaps="true"
+                android:text="Cancel"
+                android:textAllCaps="false"
                 android:layout_marginEnd="24dp"
                 android:background="@drawable/dialog_cancel_bg"
+                android:layout_weight="1"
                 android:id="@+id/cancelButton"/>
 
             <android.widget.Button
-                android:layout_width="120dp"
-                android:layout_height="50dp"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
                 android:textSize="16dp"
                 android:textColor="@color/white"
-                android:text="confirm"
-                android:textAllCaps="true"
+                android:text="Confirm"
+                android:textAllCaps="false"
                 android:background="@drawable/dialog_confirm_bg"
+                android:layout_weight="1"
                 android:id="@+id/confirmButton"/>
 
         </LinearLayout>

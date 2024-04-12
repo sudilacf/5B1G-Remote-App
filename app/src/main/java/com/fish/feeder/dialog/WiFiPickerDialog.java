@@ -10,6 +10,7 @@ import android.graphics.drawable.GradientDrawable;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.view.LayoutInflater;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
@@ -25,10 +26,7 @@ public class WiFiPickerDialog extends Dialog {
 
     private Context context;
     private String title;
-    private boolean isCancelable;
-    private ButtonClickListener closeButtonListener;
-    private ButtonClickListener scanButtonListener;
-    private ButtonClickListener confirmButtonListener;
+    private OnConfirmListener onConfirmListener;
 
     private final DialogWifiPickerBinding binding;
     private final WifiManager wifiManager;
@@ -51,22 +49,20 @@ public class WiFiPickerDialog extends Dialog {
 
         binding.title.setText(title);
         binding.closeButton.setOnClickListener(v->{
-            if(closeButtonListener != null){
-                closeButtonListener.onClick();
-            }
             this.dismiss();
         });
 
         binding.scanBtn.setOnClickListener(v->{
-            if(scanButtonListener != null) {
-                scanButtonListener.onClick();
-                wifiManager.startScan();
-            }
+            wifiManager.startScan();
+            Toast.makeText(getContext(), "Scanning available networks...", Toast.LENGTH_LONG).show();
         });
 
         binding.confirmBtn.setOnClickListener(v->{
-            if(confirmButtonListener != null) {
-                confirmButtonListener.onClick();
+            if(onConfirmListener != null) {
+                if(wifiNetworks.isEmpty()) {
+                    Toast.makeText(getContext(), "Please select your network!", Toast.LENGTH_LONG).show();
+                    onConfirmListener.onConfirmed(binding.wifiSSID.getSelectedItem().toString(), binding.wifiPassword.getText().toString());
+                }
             }
             this.dismiss();
         });
@@ -78,10 +74,7 @@ public class WiFiPickerDialog extends Dialog {
         super(context);
         this.context = context;
         this.title = builder.title;
-        this.isCancelable = builder.isCancelable;
-        this.closeButtonListener = builder.closeButtonListener;
-        this.scanButtonListener = builder.scanButtonListener;
-        this.confirmButtonListener = builder.confirmButtonListener;
+        this.onConfirmListener = builder.onConfirmListener;
         wifiManager = (WifiManager) getContext().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiNetworks = new ArrayList<>();
         spinnerAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_dropdown_item, wifiNetworks);
@@ -90,27 +83,27 @@ public class WiFiPickerDialog extends Dialog {
         binding = DialogWifiPickerBinding.inflate(LayoutInflater.from(context));
         this.setContentView(binding.getRoot());
         this.getWindow().setBackgroundDrawable(new GradientDrawable() { public GradientDrawable gd() { this.setColor(Color.TRANSPARENT); return this; } }.gd());
+        this.setCancelable(builder.isCancelable);
 
         binding.title.setText(title);
         binding.closeButton.setOnClickListener(v->{
-            if(closeButtonListener != null){
-                closeButtonListener.onClick();
-            }
             this.dismiss();
         });
 
         binding.scanBtn.setOnClickListener(v->{
-            if(scanButtonListener != null) {
-                scanButtonListener.onClick();
-                wifiManager.startScan();
-            }
+            wifiManager.startScan();
+            Toast.makeText(getContext(), "Scanning available networks...", Toast.LENGTH_LONG).show();
         });
 
         binding.confirmBtn.setOnClickListener(v->{
-            if(confirmButtonListener != null) {
-                confirmButtonListener.onClick();
+            if(onConfirmListener != null) {
+                if(wifiNetworks.isEmpty()) {
+                    Toast.makeText(getContext(), "Please select your network!", Toast.LENGTH_LONG).show();
+                } else {
+                    this.dismiss();
+                    onConfirmListener.onConfirmed(binding.wifiSSID.getSelectedItem().toString(), binding.wifiPassword.getText().toString());
+                }
             }
-            this.dismiss();
         });
 
     }
@@ -119,20 +112,9 @@ public class WiFiPickerDialog extends Dialog {
         this.title = title;
     }
 
-    public void setIsCancelable(boolean isCancelable) {
-        this.isCancelable = isCancelable;
-    }
-
-    public void setCloseButtonListener(ButtonClickListener closeButtonListener) {
-        this.closeButtonListener = closeButtonListener;
-    }
-
-    public void setScanButtonListener(ButtonClickListener scanButtonListener) {
-        this.scanButtonListener = scanButtonListener;
-    }
-
-    public void setConfirmButtonListener(ButtonClickListener confirmButtonListener) {
-        this.confirmButtonListener = confirmButtonListener;
+    public WiFiPickerDialog onConfirmLister(OnConfirmListener onConfirmListener) {
+        this.onConfirmListener = onConfirmListener;
+        return this;
     }
 
     private final BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
@@ -173,9 +155,7 @@ public class WiFiPickerDialog extends Dialog {
         private Context context;
         private String title;
         private boolean isCancelable = true;
-        private ButtonClickListener closeButtonListener;
-        private ButtonClickListener scanButtonListener;
-        private ButtonClickListener confirmButtonListener;
+        private OnConfirmListener onConfirmListener;
 
         public Builder(Context context) {
 
@@ -193,18 +173,8 @@ public class WiFiPickerDialog extends Dialog {
             return this;
         }
 
-        public Builder setOnCloseButtonClick(ButtonClickListener closeButtonListener) {
-            this.closeButtonListener = closeButtonListener;
-            return this;
-        }
-
-        public Builder setOnScanButtonClick(ButtonClickListener scanButtonListener) {
-            this.scanButtonListener = scanButtonListener;
-            return this;
-        }
-
-        public Builder setOnConfirmButtonClick(ButtonClickListener confirmButtonListener) {
-            this.confirmButtonListener = confirmButtonListener;
+        public Builder onConfirmLister(OnConfirmListener onConfirmListener) {
+            this.onConfirmListener = onConfirmListener;
             return this;
         }
 
@@ -216,9 +186,9 @@ public class WiFiPickerDialog extends Dialog {
 
     }
 
-    public interface ButtonClickListener {
+    public interface OnConfirmListener {
 
-        void onClick();
+        void onConfirmed(String SSID, String password);
 
     }
 
