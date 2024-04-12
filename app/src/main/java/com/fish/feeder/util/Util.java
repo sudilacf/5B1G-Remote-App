@@ -111,8 +111,8 @@ public class Util {
     public static String getFormattedTime(String format, int offset) throws ParseException {
 
         long epochTime = Instant.now().getEpochSecond() + (offset * 3600L);
-        Date date = new Date(epochTime);
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.ENGLISH);
+        Date date = new Date(epochTime * 1000);
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:00 a", Locale.ENGLISH);
         String formattedDate = sdf.format(date);
 
         return formattedDate;

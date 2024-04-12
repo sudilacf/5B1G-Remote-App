@@ -35,6 +35,7 @@ import com.fish.feeder.dialog.CustomDialog;
 import com.fish.feeder.dialog.CustomProgressDialog;
 import com.fish.feeder.dialog.SettingsDialog;
 import com.fish.feeder.dialog.WiFiPickerDialog;
+import com.fish.feeder.model.Data;
 import com.fish.feeder.model.History;
 import com.fish.feeder.util.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -68,6 +69,8 @@ public class HomeFragment extends Fragment {
     private long lastEpochTime;
     private String nextFeedValue;
     private String pushKeyValue;
+    private int foodQuantityValue;
+    private int frequencyValue;
     private boolean needToUpdateFrequency = false;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
@@ -87,8 +90,8 @@ public class HomeFragment extends Fragment {
                 .build();
 
         historyReference.limitToLast(1).addValueEventListener(historyEventListener);
-        dataReference.child("next_feed").addValueEventListener(feedEventListener);
-        dataReference.child("push_key").addListenerForSingleValueEvent(pushKeyEventListener);
+        dataReference.addValueEventListener(dataEventListener);
+        dataReference.child("offset").addListenerForSingleValueEvent(frequencyEventListener);
         handler.post(runnable);
 
         Util.setGradientBackground(binding.feedNow, "#A8FF78", "#78FFD6", 24, true);
@@ -310,67 +313,100 @@ public class HomeFragment extends Fragment {
 
             SettingsDialog settingsDialog = new SettingsDialog.Builder(getContext())
                     .setTitle("Feed Settings")
-                    .setOnSaveListener(new SettingsDialog.OnSaveListener() {
-                        @Override
-                        public void onSaved(int quantity, int frequency) {
+                    .setFoodQuantity(foodQuantityValue)
+                    .setFrequency(frequencyValue)
+                    .create();
+            settingsDialog.setOnSaveListener(new SettingsDialog.OnSaveListener() {
+                @Override
+                public void onSaved(int quantity, int frequency) {
 
-                            progressDialog.show();
-
-                            dataReference.runTransaction(new Transaction.Handler() {
-                                @NonNull
+                    progressDialog.show();
+                    settingsDialog.dismiss();
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("food_quantity", quantity);
+                    updates.put("offset", frequency);
+                    dataReference.child("food_quantity").setValue(quantity)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
-                                public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                                public void onComplete(@NonNull Task<Void> task) {
 
-                                    Integer foodQuantity = currentData.child("food_quantity").getValue(Integer.class);
-                                    Integer offset = currentData.child("offset").getValue(Integer.class);
-                                    needToUpdateFrequency = frequency == offset;
-                                    currentData.child("food_quantity").setValue(quantity);
-                                    currentData.child("offset").setValue(frequency);
+                                    if(task.isSuccessful()) {
 
-                                    return Transaction.success(currentData);
+                                        dataReference.child("offset").setValue(frequency)
+                                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if(task.isSuccessful()) {
 
-                                }
+                                                            Toast.makeText(getContext(), "Settings saved!", Toast.LENGTH_SHORT).show();
 
-                                @Override
-                                public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                                                            progressDialog.dismiss();
+                                                            needToUpdateFrequency = frequencyValue != frequency;
 
-                                    if (error != null) {
-                                        error.toException().printStackTrace();
-                                    } else {
-                                        if (committed && needToUpdateFrequency) {
+                                                            if(needToUpdateFrequency) {
 
-                                            CustomDialog dialog = new CustomDialog.Builder(getContext())
-                                                    .setTitle("Confirmation")
-                                                    .setMessage("Frequency was changed. Would you like to update next feed schedule?")
-                                                    .setCancelable(false)
-                                                    .setCancelButton("No", null)
-                                                    .setConfirmButton("Yes", new CustomDialog.OnClickListener() {
-                                                        @Override
-                                                        public void onClick() {
+                                                                frequencyValue = frequency;
 
-                                                            dataReference.child("next_feed").setValue(Util.getFormattedTime(nextFeedValue, currentData.child("offset").getValue(Integer.class)))
-                                                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                        @Override
-                                                                        public void onComplete(@NonNull Task<Void> task) {
-                                                                            dialog.dismiss();
+                                                                CustomDialog dialog = new CustomDialog.Builder(getContext())
+                                                                        .setTitle("Confirmation")
+                                                                        .setMessage("Feed frequency was changed. Would you like to update next feed schedule?")
+                                                                        .setCancelButton("No", null)
+                                                                        .setCancelable(false)
+                                                                        .build();
+
+                                                                dialog.setConfirmButton("Yes", new CustomDialog.OnClickListener() {
+                                                                    @Override
+                                                                    public void onClick() {
+
+                                                                        progressDialog.show();
+                                                                        dialog.dismiss();
+                                                                        try {
+                                                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+                                                                                dataReference.child("next_feed").setValue(Util.getFormattedTime(nextFeedValue, frequency))
+                                                                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                            @Override
+                                                                                            public void onComplete(@NonNull Task<Void> task) {
+
+                                                                                                progressDialog.dismiss();
+                                                                                                if(task.isSuccessful()) {
+                                                                                                    Toast.makeText(getContext(), "Feed schedule updated successfully!", Toast.LENGTH_LONG).show();
+                                                                                                } else {
+                                                                                                    task.getException().printStackTrace();
+                                                                                                }
+
+                                                                                            }
+                                                                                        });
+
+                                                                            }
+                                                                        } catch (ParseException e) {
+                                                                            throw new RuntimeException(e);
                                                                         }
-                                                                    });
-        
+
+                                                                    }
+                                                                });
+
+                                                                dialog.show();
+
+                                                            }
+
+                                                        } else {
+                                                            Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                                            task.getException().printStackTrace();
                                                         }
-                                                    })
-                                                    .build();
+                                                    }
+                                                });
 
-                                            dialog.show();
-
-                                        }
+                                    } else {
+                                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                        task.getException().printStackTrace();
                                     }
 
                                 }
                             });
 
-                        }
-                    })
-                    .create();
+                }
+            });
 
             settingsDialog.show();
 
@@ -379,6 +415,36 @@ public class HomeFragment extends Fragment {
         return binding.getRoot();
 
     }
+
+    private final ValueEventListener dataEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+            nextFeedValue = snapshot.child("next_feed").getValue(String.class);
+            pushKeyValue = snapshot.child("push_key").getValue(String.class);
+            foodQuantityValue = snapshot.child("food_quantity").getValue(Integer.class);
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
+    };
+
+    private final ValueEventListener frequencyEventListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+            frequencyValue = snapshot.getValue(Integer.class);
+
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError error) {
+
+        }
+    };
 
     private final ValueEventListener historyEventListener = new ValueEventListener() {
         @Override
@@ -405,41 +471,13 @@ public class HomeFragment extends Fragment {
         }
     };
 
-    private final ValueEventListener feedEventListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-            feedOnValue = snapshot.getValue(String.class);
-
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError error) {
-
-        }
-    };
-
-    private final ValueEventListener pushKeyEventListener = new ValueEventListener() {
-        @Override
-        public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-            pushKeyValue = snapshot.getValue(String.class);
-
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError error) {
-
-        }
-    };
-
     private final Runnable runnable = new Runnable() {
         @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         public void run() {
             binding.lastFed.setText(Util.getLastFedTime(lastEpochTime));
             try {
-                binding.nextFeed.setText((Util.getFeedTime(feedOnValue)));
+                binding.nextFeed.setText((Util.getFeedTime(nextFeedValue)));
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }

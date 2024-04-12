@@ -15,6 +15,8 @@ public class SettingsDialog extends Dialog {
     private Context context;
     private final DialogSettingsBinding binding;
     private String title;
+    private int foodQuantity;
+    private int frequency;
     private OnCancelListener onCancelListener;
     private OnSaveListener onSaveListener;
 
@@ -26,9 +28,13 @@ public class SettingsDialog extends Dialog {
         this.setContentView(binding.getRoot());
         this.getWindow().setBackgroundDrawable(new GradientDrawable() { public GradientDrawable gd() { this.setColor(Color.TRANSPARENT); return this; } }.gd());
         binding.title.setText(title);
+        binding.foodQuantity.setText(String.valueOf(foodQuantity));
+        binding.foodFrequency.setText(String.valueOf(frequency));
         binding.cancelBtn.setOnClickListener(v->{
             this.dismiss();
-            onCancelListener.onCancel();
+            if(onCancelListener != null) {
+                onCancelListener.onCancel();
+            }
         });
         binding.saveBtn.setOnClickListener(v->{
             int quantity = Integer.valueOf(binding.foodQuantity.getText().toString());
@@ -49,9 +55,13 @@ public class SettingsDialog extends Dialog {
         this.setContentView(binding.getRoot());
         this.getWindow().setBackgroundDrawable(new GradientDrawable() { public GradientDrawable gd() { this.setColor(Color.TRANSPARENT); return this; } }.gd());
         binding.title.setText(title);
+        binding.foodQuantity.setText(String.valueOf(builder.foodQuantity));
+        binding.foodFrequency.setText(String.valueOf(builder.frequency));
         binding.cancelBtn.setOnClickListener(v->{
             this.dismiss();
-            onCancelListener.onCancel();
+            if(onCancelListener != null) {
+                onCancelListener.onCancel();
+            }
         });
         binding.saveBtn.setOnClickListener(v->{
             int quantity = Integer.valueOf(binding.foodQuantity.getText().toString());
@@ -63,6 +73,14 @@ public class SettingsDialog extends Dialog {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void setFoodQuantity(int foodQuantity) {
+        this.foodQuantity = foodQuantity;
+    }
+
+    public void setFrequency(int frequency) {
+        this.frequency = frequency;
     }
 
     public void setOnCancelListener(OnCancelListener onCancelListener) {
@@ -77,6 +95,8 @@ public class SettingsDialog extends Dialog {
 
         private Context context;
         private String title;
+        private int foodQuantity;
+        private int frequency;
         private OnCancelListener onCancelListener;
         private OnSaveListener onSaveListener;
 
@@ -86,6 +106,16 @@ public class SettingsDialog extends Dialog {
 
         public Builder setTitle(String title) {
             this.title = title;
+            return this;
+        }
+
+        public Builder setFoodQuantity(int foodQuantity) {
+            this.foodQuantity = foodQuantity;
+            return this;
+        }
+
+        public Builder setFrequency(int frequency) {
+            this.frequency = frequency;
             return this;
         }
 

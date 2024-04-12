@@ -87,11 +87,13 @@ public class CustomDialog extends Dialog {
 
     public void setCancelButton(String cancelButton, OnClickListener listener) {
         this.cancelButton = cancelButton;
+        binding.cancelButton.setText(cancelButton);
         this.cancelListener = listener;
     }
 
     public void setConfirmButton(String confirmButton, OnClickListener listener) {
         this.confirmButton = confirmButton;
+        binding.confirmButton.setText(confirmButton);
         this.confirmListener = listener;
     }
 
