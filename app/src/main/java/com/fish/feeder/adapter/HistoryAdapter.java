@@ -2,10 +2,12 @@ package com.fish.feeder.adapter;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fish.feeder.databinding.ItemHistoryBinding;
@@ -41,6 +43,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull HistoryAdapter.ViewHolder holder, int position) {
 

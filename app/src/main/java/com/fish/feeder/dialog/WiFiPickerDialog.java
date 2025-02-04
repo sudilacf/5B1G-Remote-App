@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -117,6 +118,7 @@ public class WiFiPickerDialog extends Dialog {
         return this;
     }
 
+    @SuppressLint("MissingPermission")
     private final BroadcastReceiver wifiScanReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

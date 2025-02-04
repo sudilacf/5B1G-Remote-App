@@ -35,7 +35,6 @@ import com.fish.feeder.dialog.CustomDialog;
 import com.fish.feeder.dialog.CustomProgressDialog;
 import com.fish.feeder.dialog.SettingsDialog;
 import com.fish.feeder.dialog.WiFiPickerDialog;
-import com.fish.feeder.model.Data;
 import com.fish.feeder.model.History;
 import com.fish.feeder.util.Util;
 import com.google.android.gms.tasks.OnCompleteListener;
